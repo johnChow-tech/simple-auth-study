@@ -36,3 +36,4 @@ db.sqlite3
 # general
 # ====================
 .env
+__pycache__
