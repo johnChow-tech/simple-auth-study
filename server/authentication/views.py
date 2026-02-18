@@ -1,7 +1,10 @@
 from django.contrib.auth import authenticate  # 核心比对工具
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,  # 🚩 导入这个保安
+)
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken  # JWT 签发工具
 
@@ -88,3 +91,21 @@ QA 脑洞场景：假设用户 A 登录了，拿到了 Token。半分钟后，�
 
 答案是：如果不做特殊处理，他依然能访问！因为 JWT 的校验是在本地解密计算的，不需要查数据库！
 """
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])  # 🔒 核心拦截器：没有合法 Token 的，统统挡在门外
+def protected_vip_data(request):
+    # 只要能走到这一行，说明 DRF 已经帮你验证过 Token，
+    # 并且把 Token 里的 user_id 还原成了真实的 user 对象！
+    user = request.user
+
+    return Response(
+        {
+            "message": "欢迎进入 VIP 包厢！",
+            "username": user.username,
+            "email": user.email,
+            "vip_secret": "这是只有登录用户才能看到的绝密财报数据 📈",
+        },
+        status=status.HTTP_200_OK,
+    )

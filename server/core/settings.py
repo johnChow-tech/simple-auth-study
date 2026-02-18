@@ -130,3 +130,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+REST_FRAMEWORK = {
+    # 配置默认的身份认证类（配置保安的装备）
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",  # 🚩 核心！教 DRF 认识 JWT
+        "rest_framework.authentication.SessionAuthentication",  # 兼容 Django 自带的后台
+        "rest_framework.authentication.BasicAuthentication",
+    ),
+}

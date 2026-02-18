@@ -29,6 +29,7 @@ Content-Type: {{contentType}}
 
 ### 3. 正常登录 (Happy Path) - 获取 JWT 门票
 # [QA 预期]：返回 200 OK，且 Body 中必须包含 tokens.access 和 tokens.refresh
+# @name login_api
 POST {{baseUrl}}/api/login/
 Content-Type: {{contentType}}
 
@@ -76,3 +77,24 @@ Content-Type: {{contentType}}
     "password": "SafePassword123"
     // 故意不传 username 字段
 }
+
+### ========================================
+### 受保护的接口测试 (VIP Area)
+### ========================================
+
+### 8. 正常访问 VIP 接口 (Happy Path)
+# [QA 预期]：返回 200 OK，并看到那条“绝密财报数据”
+GET {{baseUrl}}/api/vip/
+Authorization: Bearer {{login_api.response.body.tokens.access}}
+
+
+### 9. 异常访问 (Negative) - 不带钥匙闯关
+# [QA 预期]：返回 401 Unauthorized，报错 details: "身份认证信息未提供。"
+GET {{baseUrl}}/api/vip/
+# 故意注释掉 Authorization 头
+
+
+### 10. 异常访问 (Negative) - 拿伪造的钥匙闯关
+# [QA 预期]：返回 401 Unauthorized，报错 details: "给定的令牌无效..."
+GET {{baseUrl}}/api/vip/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs123456
