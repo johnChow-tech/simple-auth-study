@@ -10,3 +10,69 @@ Content-Type: {{contentType}}
     "password": "SafePassword123",
     "email": "test@example.com"
 }
+
+### 2. 异常注册 (Negative) - 用户名重复
+# [QA 预期]：返回 400 Bad Request，且 body 中明确提示 username 已存在。
+# 测试前置条件：请确保你的数据库里已经存在名为 "tester001" 的用户 (可以先手动发一次该名字的注册请求)
+POST {{baseUrl}}/api/register/
+Content-Type: {{contentType}}
+
+{
+    "username": "tester001", 
+    "password": "AnotherPassword456",
+    "email": "duplicate@example.com"
+}
+
+### ========================================
+### 登录鉴权接口测试 (Login & JWT)
+### ========================================
+
+### 3. 正常登录 (Happy Path) - 获取 JWT 门票
+# [QA 预期]：返回 200 OK，且 Body 中必须包含 tokens.access 和 tokens.refresh
+POST {{baseUrl}}/api/login/
+Content-Type: {{contentType}}
+
+{
+    "username": "tester001", 
+    "password": "AnotherPassword456"
+}
+
+### 4. 异常登录 (Negative) - 密码错误
+# [QA 预期]：返回 401 Unauthorized，报错信息必须是模糊的“用户名或密码错误”
+POST {{baseUrl}}/api/login/
+Content-Type: {{contentType}}
+
+{
+    "username": "tester001",
+    "password": "WrongPassword!@#"
+}
+
+### 5. 异常登录 (Negative) - 用户不存在 (防枚举攻击测试)
+# [QA 预期]：返回 401 Unauthorized，报错信息与“密码错误”完全一致！绝对不能提示“用户不存在”
+POST {{baseUrl}}/api/login/
+Content-Type: {{contentType}}
+
+{
+    "username": "ghost_user_999",
+    "password": "AnyPassword"
+}
+
+### 6. 异常登录 (Negative) - 缺少必填项 (入参校验测试)
+# [QA 预期]：返回 400 Bad Request，提示缺少密码 (如果你已经拆分了报错逻辑)
+POST {{baseUrl}}/api/login/
+Content-Type: {{contentType}}
+
+{
+    "username": "tester001"
+    // 故意不传 password 字段
+}
+
+### 7. 异常登录 (Negative) - 缺少必填项 (缺失用户名)
+# [QA 预期]：返回 400 Bad Request，明确提示“请提供用户名” (验证独立拆分的报错逻辑)
+POST {{baseUrl}}/api/login/
+Content-Type: {{contentType}}
+
+{
+    "password": "SafePassword123"
+    // 故意不传 username 字段
+}
