@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",  # 处理 JWT 逻辑
     "corsheaders",  # 处理跨域这道“墙”
+    "authentication",
     # ===============以上为手动注册的app===============
 ]
 
