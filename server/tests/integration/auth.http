@@ -1,0 +1,12 @@
+@baseUrl = http://127.0.0.1:8000
+@contentType = application/json
+
+### 1. 注册新用户
+POST {{baseUrl}}/api/register/
+Content-Type: {{contentType}}
+
+{
+    "username": "tester_{{$datetime 'YYYYMMDD_HHmmss'}}", 
+    "password": "SafePassword123",
+    "email": "test@example.com"
+}
